@@ -38,11 +38,14 @@ Players are scored and ranked for three distinct winger roles:
 ```
 football-scouting-platform/
 ├── notebooks/              # Jupyter notebooks for analysis
-│   ├── extract_wingers.ipynb          # Extract winger events from StatsBomb
-│   ├── wingers_features.ipynb         # Compute per90 features
-│   ├── winger_profiles.ipynb          # PCA + Clustering
-│   ├── winger_shortlists.ipynb        # Role-based scoring & shortlists
-│   └── team_fit_recommender.ipynb     # Team-fit recommendations
+│   ├── load_statsbomb_events.ipynb      # Load and process StatsBomb event data
+│   ├── extract_wingers.ipynb            # Extract winger events from lineups
+│   ├── wingers_features.ipynb           # Compute basic per90 features
+│   ├── wingers_features_v2.ipynb        # Enhanced feature engineering
+│   ├── winger_profiles.ipynb            # PCA + K-Means clustering
+│   ├── winger_shortlists.ipynb          # Basic role-based scoring
+│   ├── winger_shortlists_v2.ipynb       # Advanced role scoring with stability
+│   └── team_fit_recommender.ipynb       # Team-fit recommendations
 ├── frontend/               # Streamlit dashboard
 │   ├── app.py                         # Main dashboard application
 │   └── README.md                      # Dashboard documentation
@@ -88,19 +91,28 @@ The dashboard will open in your browser at `http://localhost:8501`
 Run the notebooks in order to generate the required data files:
 
 ```bash
-# 1. Extract winger events from StatsBomb data
+# 1. Load StatsBomb event data
+jupyter notebook notebooks/load_statsbomb_events.ipynb
+
+# 2. Extract winger events from lineups
 jupyter notebook notebooks/extract_wingers.ipynb
 
-# 2. Compute per90 features
+# 3. Compute basic per90 features
 jupyter notebook notebooks/wingers_features.ipynb
 
-# 3. Build clusters and profiles
+# 4. Enhanced feature engineering (optional - v2)
+jupyter notebook notebooks/wingers_features_v2.ipynb
+
+# 5. Build clusters and profiles
 jupyter notebook notebooks/winger_profiles.ipynb
 
-# 4. Generate role-based shortlists
+# 6. Generate basic role-based shortlists
 jupyter notebook notebooks/winger_shortlists.ipynb
 
-# 5. Create team-fit recommendations (optional)
+# 7. Advanced role scoring with stability (v2)
+jupyter notebook notebooks/winger_shortlists_v2.ipynb
+
+# 8. Create team-fit recommendations
 jupyter notebook notebooks/team_fit_recommender.ipynb
 ```
 

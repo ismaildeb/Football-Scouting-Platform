@@ -49,11 +49,15 @@ You have **two options**:
    # Open Jupyter and run these notebooks IN ORDER:
    jupyter notebook
    
-   # Run cells in each notebook:
-   1. notebooks/extract_wingers.ipynb
-   2. notebooks/wingers_features.ipynb
-   3. notebooks/winger_profiles.ipynb
-   4. notebooks/winger_shortlists.ipynb
+   # Run cells in each notebook (8 total):
+   1. notebooks/load_statsbomb_events.ipynb      # Load StatsBomb data
+   2. notebooks/extract_wingers.ipynb            # Extract winger events
+   3. notebooks/wingers_features.ipynb           # Basic per90 features
+   4. notebooks/wingers_features_v2.ipynb        # Enhanced features (optional)
+   5. notebooks/winger_profiles.ipynb            # PCA + Clustering
+   6. notebooks/winger_shortlists.ipynb          # Basic role scoring
+   7. notebooks/winger_shortlists_v2.ipynb       # Advanced scoring with stability
+   8. notebooks/team_fit_recommender.ipynb       # Team-fit recommendations
    ```
 
 #### Option B: Request Sample Data (For testing/demo)
@@ -134,11 +138,15 @@ streamlit run frontend/app.py
 
 ```
 football-scouting-platform/
-├── notebooks/              # Jupyter notebooks for data processing
-│   ├── extract_wingers.ipynb          # Extract winger events
-│   ├── wingers_features.ipynb         # Calculate per90 metrics
-│   ├── winger_profiles.ipynb          # PCA + Clustering
-│   └── winger_shortlists.ipynb        # Role scoring
+├── notebooks/              # 8 Jupyter notebooks for data processing
+│   ├── load_statsbomb_events.ipynb      # Load StatsBomb event data
+│   ├── extract_wingers.ipynb            # Extract winger events from lineups
+│   ├── wingers_features.ipynb           # Compute basic per90 metrics
+│   ├── wingers_features_v2.ipynb        # Enhanced feature engineering
+│   ├── winger_profiles.ipynb            # PCA + K-Means clustering
+│   ├── winger_shortlists.ipynb          # Basic role-based scoring
+│   ├── winger_shortlists_v2.ipynb       # Advanced role scoring
+│   └── team_fit_recommender.ipynb       # Tactical fit analysis
 ├── frontend/               # Dashboard application
 │   └── app.py                         # Streamlit app
 ├── data/
