@@ -146,9 +146,6 @@ See `requirements.txt`:
 - streamlit - Dashboard framework
 - jupyter - Notebook environment
 
-## 📄 License
-
-[Add your license here - MIT/Apache/etc.]
 
 ## 🤝 Contributing
 
@@ -159,17 +156,5 @@ Contributions welcome! Areas for improvement:
 - Video integration
 - API development
 
-## 📬 Contact
 
-- **Author**: [Your Name]
-- **Email**: [Your Email]
-- **LinkedIn/Twitter**: [Your Social]
 
-## 🙏 Acknowledgments
-
-- StatsBomb for open football event data
-- Football analytics community
-
----
-
-*Built for modern football recruitment*
