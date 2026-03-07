@@ -17,4 +17,3 @@ Dashboard reads files from `data/processed`:
 - `team_fit_shortlists.csv` (optional)
 - `shortlist_*_v2.csv` (fallback: `shortlist_*.csv`)
 
-Run notebooks first to generate these outputs.
