@@ -29,3 +29,6 @@ Dashboard reads files from `data/processed`:
 - `team_fit_shortlists.csv` (optional)
 - `shortlist_*_v2.csv` (fallback: `shortlist_*.csv`)
 
+If these files are absent, the dashboard starts in demo mode with synthetic
+players and synthetic shortlists.
+

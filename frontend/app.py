@@ -15,6 +15,113 @@ st.set_page_config(
 DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "processed"
 
 
+def create_demo_data() -> Dict[str, pd.DataFrame]:
+    names = [
+        "Alex Morgan",
+        "Theo Silva",
+        "Liam Costa",
+        "Noah Diallo",
+        "Milan Reyes",
+        "Lucas Bauer",
+        "Enzo Martin",
+        "Ibrahim Kane",
+        "Leo Santos",
+        "Yanis Morel",
+        "Adam Rossi",
+        "Elias Haddad",
+    ]
+
+    role_scores = pd.DataFrame(
+        {
+            "player_id": range(1001, 1013),
+            "player_name": names,
+            "cluster_name": [
+                "Direct Attackers",
+                "Creative Wingers",
+                "Inside Forwards",
+                "Direct Attackers",
+                "Creative Wingers",
+                "Inside Forwards",
+                "Direct Attackers",
+                "Creative Wingers",
+                "Inside Forwards",
+                "Direct Attackers",
+                "Creative Wingers",
+                "Inside Forwards",
+            ],
+            "minutes": [3200, 2950, 2800, 2600, 2450, 2300, 2100, 1950, 1800, 1650, 1500, 1200],
+            "cluster_agreement": [0.91, 0.88, 0.86, 0.84, 0.82, 0.79, 0.77, 0.75, 0.73, 0.71, 0.68, 0.64],
+            "age_cohort": [
+                "U23",
+                "23-27",
+                "23-27",
+                "U23",
+                "28+",
+                "23-27",
+                "U23",
+                "23-27",
+                "28+",
+                "U23",
+                "23-27",
+                "28+",
+            ],
+        }
+    )
+
+    for index in range(len(role_scores)):
+        role_scores.loc[index, "score_direct_runner_adj"] = 55 + (index * 3) % 40
+        role_scores.loc[index, "score_playmaker_winger_adj"] = 50 + (index * 7) % 45
+        role_scores.loc[index, "score_inside_forward_adj"] = 48 + (index * 5) % 47
+        role_scores.loc[index, "dribbles_pct"] = 50 + (index * 4) % 50
+        role_scores.loc[index, "progressive_passes_pct"] = 45 + (index * 6) % 55
+        role_scores.loc[index, "shots_pct"] = 40 + (index * 5) % 60
+        role_scores.loc[index, "xg_pct"] = 45 + (index * 7) % 55
+        role_scores.loc[index, "ball_carries_pct"] = 50 + (index * 3) % 50
+
+    shortlists = {}
+    for role in ["direct_runner", "playmaker_winger", "inside_forward"]:
+        score_column = f"score_{role}_adj"
+        shortlist = role_scores.nlargest(8, score_column)[
+            ["player_id", "player_name", "minutes", "cluster_name", score_column]
+        ].copy()
+        shortlist["rank"] = range(1, len(shortlist) + 1)
+        shortlists[role] = shortlist
+
+    team_fit = pd.DataFrame(
+        [
+            {
+                "team_style": style,
+                "rank": rank,
+                "player_id": int(row["player_id"]),
+                "player_name": row["player_name"],
+                "team_fit_score": round(float(row["score_direct_runner_adj"] if style == "counter_attack" else row["score_playmaker_winger_adj"]), 1),
+            }
+            for style in ["possession", "counter_attack", "direct"]
+            for rank, (_, row) in enumerate(role_scores.iterrows(), start=1)
+        ]
+    )
+
+    return {
+        "role_scores": role_scores,
+        "profiles": role_scores[
+            ["player_id", "player_name", "cluster_name", "minutes", "cluster_agreement"]
+        ].copy(),
+        "similar": pd.DataFrame(),
+        "team_fit": team_fit,
+        "shortlists": shortlists,
+    }
+
+
+def read_optional_file(path: Path, reader) -> pd.DataFrame:
+    if not path.exists():
+        return pd.DataFrame()
+    try:
+        return reader(path)
+    except (FileNotFoundError, OSError, ValueError, pd.errors.EmptyDataError) as exc:
+        st.warning(f"Could not read {path.name}: {exc}")
+        return pd.DataFrame()
+
+
 @st.cache_data
 def load_data() -> Dict[str, pd.DataFrame]:
     data = {}
@@ -22,25 +129,23 @@ def load_data() -> Dict[str, pd.DataFrame]:
     role_scores_path = DATA_DIR / "winger_role_scores_v2.parquet"
     if not role_scores_path.exists():
         role_scores_path = DATA_DIR / "winger_role_scores.parquet"
-    data["role_scores"] = (
-        pd.read_parquet(role_scores_path) if role_scores_path.exists() else pd.DataFrame()
-    )
+    data["role_scores"] = read_optional_file(role_scores_path, pd.read_parquet)
 
     profiles_path = DATA_DIR / "winger_profiles.parquet"
-    data["profiles"] = pd.read_parquet(profiles_path) if profiles_path.exists() else pd.DataFrame()
+    data["profiles"] = read_optional_file(profiles_path, pd.read_parquet)
 
     similar_path = DATA_DIR / "winger_similar_players.parquet"
-    data["similar"] = pd.read_parquet(similar_path) if similar_path.exists() else pd.DataFrame()
+    data["similar"] = read_optional_file(similar_path, pd.read_parquet)
 
     team_fit_path = DATA_DIR / "team_fit_shortlists.csv"
-    data["team_fit"] = pd.read_csv(team_fit_path) if team_fit_path.exists() else pd.DataFrame()
+    data["team_fit"] = read_optional_file(team_fit_path, pd.read_csv)
 
     shortlists = {}
     for role in ["direct_runner", "playmaker_winger", "inside_forward"]:
         p = DATA_DIR / f"shortlist_{role}_v2.csv"
         if not p.exists():
             p = DATA_DIR / f"shortlist_{role}.csv"
-        shortlists[role] = pd.read_csv(p) if p.exists() else pd.DataFrame()
+        shortlists[role] = read_optional_file(p, pd.read_csv)
     data["shortlists"] = shortlists
 
     return data
@@ -52,6 +157,15 @@ profiles = data["profiles"].copy()
 similar = data["similar"].copy()
 team_fit = data["team_fit"].copy()
 shortlists = data["shortlists"]
+demo_mode = role_scores.empty
+
+if demo_mode:
+    data = create_demo_data()
+    role_scores = data["role_scores"].copy()
+    profiles = data["profiles"].copy()
+    similar = data["similar"].copy()
+    team_fit = data["team_fit"].copy()
+    shortlists = data["shortlists"]
 
 # Fallback name enrichment if role_scores is missing player_name
 if "player_name" not in role_scores.columns and not profiles.empty and "player_id" in profiles.columns:
@@ -70,9 +184,11 @@ if "player_name" not in role_scores.columns and not profiles.empty and "player_i
 st.title("Winger Scouting Platform")
 st.caption("Recruitment-focused winger profiling, role scoring, and team-fit shortlisting")
 
-if role_scores.empty:
-    st.error("No role scores file found. Run your feature/shortlist notebooks first.")
-    st.stop()
+if demo_mode:
+    st.info(
+        "Demo mode: synthetic players are shown because no processed role-score file "
+        "was found. Add data/processed/winger_role_scores_v2.parquet to use real data."
+    )
 
 if "cluster_name" not in role_scores.columns:
     role_scores["cluster_name"] = "Unknown"

@@ -92,6 +92,10 @@ streamlit run frontend/app.py
 
 The dashboard will open in your browser at `http://localhost:8501`
 
+If no processed data is available, the dashboard automatically starts in demo
+mode with synthetic players. It does not require StatsBomb data or large files
+to be downloaded.
+
 ### Run with Docker
 
 The dashboard can run in Docker without copying generated data into the image:
