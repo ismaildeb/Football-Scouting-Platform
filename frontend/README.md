@@ -14,6 +14,12 @@ Run the ingestion tests with:
 python -m unittest discover -s tests -v
 ```
 
+## Docker
+
+```powershell
+docker compose up --build
+```
+
 ## Data Inputs
 Dashboard reads files from `data/processed`:
 

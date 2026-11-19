@@ -92,6 +92,17 @@ streamlit run frontend/app.py
 
 The dashboard will open in your browser at `http://localhost:8501`
 
+### Run with Docker
+
+The dashboard can run in Docker without copying generated data into the image:
+
+```bash
+docker compose up --build
+```
+
+Place optional generated files in `data/processed/`. The dashboard is available at
+`http://localhost:8501`.
+
 ### Generate Data (First Time Setup)
 
 Run the notebooks in order to generate the required data files:
